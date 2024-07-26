@@ -132,4 +132,32 @@ test('executing values', async ({page}) => {
     const emailValue = await emailField.inputValue()
     expect(emailValue).toEqual('test@gmail.com')
 
+    // get attribute value
+
+    const placeholderValue = await emailField.getAttribute('placeholder')
+    expect(placeholderValue).toEqual('email')
+
 })
+
+
+test('assertions', async ({page}) => {
+
+    //general assertions
+    const basicLocator = page.locator('nb-card').filter({hasText:"Basic form"}).locator('button')
+    const text = await basicLocator.textContent()
+    expect(text).toEqual('Submit')
+
+
+    //locator assertion
+
+    await expect(basicLocator).toHaveText('Submit')
+
+    //soft assertion
+    await expect.soft(basicLocator).toHaveText('Submit')
+    //then you can add action even this test is not working
+    await basicLocator.click()
+
+
+
+})
+
