@@ -1,4 +1,4 @@
-import {test} from '@playwright/test'
+import {test, expect} from '@playwright/test'
 
 
 test.beforeEach(async({page}) => {
@@ -84,4 +84,52 @@ test('user facing locators', async({page}) => {
     await page.getByTitle('IoT Dashboard').click()
 
     await page.getByTestId('SignIn')
+})
+
+// find child
+test('find child', async ({page}) => {
+    await page.locator('nb-card nb-radio :text-is("Option 1")').click()
+})
+
+//find parent
+test('find parent', async ({page}) => {
+    await page.locator('nb-card', {hasText:"Using the Grid"}).getByRole('textbox', {name: 'Email'}).click()
+    await page.locator('nb-card', {has: page.locator('#inputPassword2')}).getByRole('textbox', {name: 'Email'}).click()
+    //or
+    await page.locator('nb-card').filter({hasText:"Basic form"}).getByRole('textbox', {name: 'Email'}).click()
+    await page.locator('nb-card').filter({has: page.locator('[placeholder="Recipients"]')}).getByRole('textbox', {name: 'Subject'}).click()
+
+    await page.locator('nb-card').filter({has: page.locator('nb-checkbox')}).filter({hasText:"Sign in"}).getByRole('textbox', {name: 'Email'}).click()
+})
+
+//resusing locator
+
+test('create resuable locator', async ({page}) => {
+    const basicLocator = page.locator('nb-card').filter({hasText:"Basic form"})
+    const emailLocator = basicLocator.getByRole('textbox', {name: 'Email'})
+
+    await emailLocator.fill("vasif@gmail.com")
+    await basicLocator.getByRole('textbox', {name: 'Password'}).fill("welcome123")
+    await basicLocator.getByRole('button').click()
+
+    await expect(emailLocator).toHaveValue('vasif@gmail.com')
+})
+
+//executing values
+test('executing values', async ({page}) => {
+    //text value
+    const basicLocator = page.locator('nb-card').filter({hasText:"Basic form"})
+    const buttonText =  await basicLocator.getByRole('button').textContent()
+    expect(buttonText).toEqual('Submit')
+
+    //all text values
+    const usingGrid = await page.locator('nb-radio').allTextContents()
+    expect(usingGrid).toContain("Option 1")
+
+    //input value
+    const emailField = basicLocator.getByRole('textbox', {name: 'Email'})
+    await emailField.fill("test@gmail.com")
+    const emailValue = await emailField.inputValue()
+    expect(emailValue).toEqual('test@gmail.com')
+
 })
