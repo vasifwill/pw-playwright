@@ -25,6 +25,9 @@ expect(succesButton1).toContainText('Data loaded with AJAX get request.')
 })
 
 test('timeout', async({page}) => {
+    //test.setTimeout(10000)
+    //test.slow()
+
     const succesButton2 = page.locator('.bg-success')
 
     await succesButton2.click({timeout:16000})
