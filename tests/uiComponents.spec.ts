@@ -41,4 +41,68 @@ test.describe('forms inputs', () => {
       })
 
 
+      
+
 })
+//check box
+test('checkboxes', async({page}) => {
+  await page.getByText('Modal & Overlays').click()
+  await page.getByText('Toastr').click()
+  await page.getByRole('checkbox', {name: "Hide on click"}).click({force: true})
+
+  //checked all of them
+  const allCheckBoxes = page.getByRole('checkbox')
+  for(const checkbox of await allCheckBoxes.all()) {
+    await checkbox.uncheck({force: true})
+    expect(await checkbox.isChecked()).toBeFalsy()
+  }
+
+})
+
+//dropdowns and list
+
+test('dropdown ', async({page}) => {
+  const dropdownMenu = page.locator('ngx-header nb-select ')
+  await dropdownMenu.click()
+  const optionList = page.locator('nb-option-list nb-option')
+  await expect(optionList).toHaveText(['Light', 'Dark', 'Cosmic', 'Corporate'])
+  await optionList.filter({hasText:'Cosmic'}).click()
+  //checking css color
+  const header = page.locator('nb-layout-header')
+  await expect(header).toHaveCSS('background-color', 'rgb(50, 50, 89)')
+
+
+
+
+const colors = {
+  "Light":"rgb(255, 255, 255)",
+  "Dark":"rgb(34, 43, 69)",
+  "Cosmic":"rgb(50, 50, 89)",
+  "Corporate":"rgb(255, 255, 255)"
+}
+await dropdownMenu.click()
+for(const color in colors) {
+  await optionList.filter({hasText:color}).click()
+  await expect(header).toHaveCSS('background-color', colors[color])
+
+  if(color != 'Corporate'){
+    await dropdownMenu.click()
+  }
+}
+
+
+})
+
+//TOOLTIPS SPAN (HOVER OVER)
+
+test('tooltip hover', async({page}) => {
+  await page.getByText('Modal & Overlays').click()
+  await page.getByText('Tooltip').click()
+
+  const toolTip = page.locator('nb-card', {hasText: 'Tooltip Placement'})
+  await toolTip.getByRole('button', {name: 'TOP'}).hover()
+  const toolTipContent = await page.locator('nb-tooltip').textContent()
+  expect(toolTipContent).toEqual('This is a tooltip')
+
+})
+
