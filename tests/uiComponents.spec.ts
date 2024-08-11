@@ -106,3 +106,54 @@ test('tooltip hover', async({page}) => {
 
 })
 
+//dialog box
+
+test('dialog box', async({page}) => {
+  await page.getByText('Tables & Data').click()
+  await page.getByText('Smart Table').click()
+  
+
+  page.on('dialog', dialog => {
+    expect(dialog.message()).toEqual('Are you sure you want to delete?')
+    dialog.accept()
+  })
+  await page.getByRole('table').locator('tr', {hasText:"mdo@gmail.com"}).locator('.nb-trash').click()
+})
+
+//web tables
+
+test('change row input', async({page}) => {
+  await page.getByText('Tables & Data').click()
+  await page.getByText('Smart Table').click()
+
+  const targetRow = page.locator('tr', {hasText:"snow@gmail.com"})
+  await targetRow.locator('.nb-edit').click()
+
+  await page.locator('input-editor').getByPlaceholder('Age').clear()
+  await page.locator('input-editor').getByPlaceholder('Age').fill('32')
+  await page.locator('.nb-checkmark').click()
+
+  //get the spesific row
+
+  await page.locator('.ng2-smart-page-link', {hasText:'2'}).click()
+   const targetById = page.getByRole('row', {name:"11"}).filter({has: page.locator('td').nth(1).getByText('11')})
+   await targetById.locator('.nb-edit').click()
+
+   await page.locator('.nb-checkmark').click()
+
+
+})
+
+//datepicker
+test('date picker', async ({page}) => {
+await page.getByText('Forms').click()
+await page.getByText('Datepicker').click()
+
+const calendarInputField = page.getByPlaceholder('Form Picker')
+await calendarInputField.click()
+
+await page.locator('[class="day-cell ng-star-inserted"]').getByText('1', {exact: true}).click()
+//assertion validation
+expect(calendarInputField).toHaveValue('Aug 1, 2024')
+
+})
